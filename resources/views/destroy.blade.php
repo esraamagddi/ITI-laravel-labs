@@ -6,6 +6,6 @@
         @csrf
         @method('DELETE')
         <p>Are you sure you want to delete this post?</p>
-        <button type="submit" class="btn btn-danger">Delete</button>
+        <x-button type="danger">Delete</x-button>
     </form>
 @endsection

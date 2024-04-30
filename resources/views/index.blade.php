@@ -24,7 +24,7 @@
                     <form action="{{ route('post.destroy', $post['id']) }}" method="POST" style="display: inline;">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</button>
+                        <x-button type="danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</x-button>
                     </form>
                 </td>
             </tr>
