@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Post;
+
 use Illuminate\Http\Request;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -29,13 +30,12 @@ class PostController extends Controller
             'title' => 'required|max:255',
             'description' => 'required',
             'body' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images/posts');
-            $data['image'] = $imagePath;
-        }
+        $imagePath = $this->fileOperations($request);
+
+        $data['image'] = $imagePath;
 
         Post::create($data);
         return redirect()->route('posts.home');
@@ -58,10 +58,9 @@ class PostController extends Controller
 
         $post = Post::findOrFail($id);
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images/posts');
-            $data['image'] = $imagePath;
-        }
+        $imagePath = $this->fileOperations($request);
+
+        $data['image'] = $imagePath;
 
         $post->update($data);
         return redirect()->route('posts.home');
@@ -73,4 +72,14 @@ class PostController extends Controller
         $post->delete();
         return redirect()->route('posts.home');
     }
+
+    private function fileOperations($request)
+    {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            return $image->store('images/posts');
+        }
+        return null;
+    }
 }
+
