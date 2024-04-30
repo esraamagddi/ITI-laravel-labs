@@ -17,9 +17,11 @@ use App\Http\Controllers\PostController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/posts',[PostController::class,'index'])->name('posts.home');
+Route::get('/posts', [PostController::class, 'index'])->name('posts.home');
+Route::get('/posts/create', [PostController::class, 'create'])->name('post.create');
+Route::post('/posts', [PostController::class, 'store'])->name('post.store');
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('post.show');
+Route::get('/posts/edit/{id}', [PostController::class, 'edit'])->name('post.edit');
+Route::put('/posts/{id}', [PostController::class, 'update'])->name('post.update');
+Route::delete('/posts/{id}', [PostController::class, 'destroy'])->name('post.destroy');
 
-Route::get("/posts/create",[PostController::class,'create'])->name('post.create');
-Route::get("/posts/{id}", [PostController::class,'show'])->name('post.show');
-Route::get("/posts/edit/{id}", [PostController::class,'edit'])->name('post.edit');
-Route::delete("/posts/{id}", [PostController::class, 'destroy'])->name('post.destroy');

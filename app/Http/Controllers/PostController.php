@@ -1,60 +1,76 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    private $posts= [
-        ['id'=>1 ,'title'=>'title1' , 'body'=> 'body1', 'image'=>'img1.jpeg'],
-        ['id'=>2 ,'title'=>'title2' , 'body'=> 'body2', 'image'=>'img2.jpeg'],
-        ['id'=>3 ,'title'=>'title3' , 'body'=> 'body3', 'image'=>'img3.jpeg'],
-        ['id'=>4 ,'title'=>'title4' , 'body'=> 'body4', 'image'=>'img4.jpeg']
-    ];
-
     public function index()
     {
-        return view("index", ["posts" => $this->posts]);
+        $posts = Post::all();
+        return view('index', compact('posts'));
     }
 
     public function show($id)
     {
-        $post = $this->getPostById($id);
-        if ($post) {
-            return view('show', ["post" => $post]);
-        }
-        return abort(404);
+        $post = Post::findOrFail($id);
+        return view('show', compact('post'));
     }
 
     public function create()
     {
-        return view("create");
+        return view('create');
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'body' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images/posts');
+            $data['image'] = $imagePath;
+        }
+
+        Post::create($data);
+        return redirect()->route('posts.home');
     }
 
     public function edit($id)
     {
-        $post = $this->getPostById($id);
-        if ($post) {
-            return view('edit', ["post" => $post]);
+        $post = Post::findOrFail($id);
+        return view('edit', compact('post'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $data = $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'body' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $post = Post::findOrFail($id);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images/posts');
+            $data['image'] = $imagePath;
         }
-        return abort(404);
+
+        $post->update($data);
+        return redirect()->route('posts.home');
     }
 
     public function destroy($id)
     {
-        $post = $this->getPostById($id);
-        if ($post) {
-            return view('destroy', ["post" => $post]);
-        }
-        return abort(404);
-    }
-
-    private function getPostById($id)
-    {
-        if ($id >= 1 && $id <= count($this->posts)) {
-            return $this->posts[$id - 1];
-        }
-        return null;
+        $post = Post::findOrFail($id);
+        $post->delete();
+        return redirect()->route('posts.home');
     }
 }
